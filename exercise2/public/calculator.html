@@ -1,24 +1,75 @@
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
+    <meta charset="UTF-8">
     <title>Calculator Example</title>
 </head>
 
 <body>
-    <div>Result
-        <span id="result"></span>
-    </div>
-</body>
-<script>
-    let num1 = 2;
-    let num2 = 4;
-    fetch(`/calculator/add?num1=${num1}&num2=${num2}`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById("result").innerHTML =
 
-                data.result;
-        })
-</script>
+    <div>
+        <label>
+            Num 1:
+            <input type="number" id="num1" placeholder="Enter first number" />
+        </label>
+        <label>
+            Num 2:
+            <input type="number" id="num2" placeholder="Enter second number" />
+        </label>
+        <button id="addBtn">Add</button>
+    </div>
+
+    <div>Result: <span id="result"></span></div>
+
+    <script>
+        const num1Input = document.getElementById('num1');
+        const num2Input = document.getElementById('num2');
+        const addBtn = document.getElementById('addBtn');
+        const resultSpan = document.getElementById('result');
+
+        function showError(msg) {
+            resultSpan.textContent = msg;
+            resultSpan.style.color = 'red';
+        }
+
+        addBtn.addEventListener('click', async () => {
+            const num1 = num1Input.value.trim();
+            const num2 = num2Input.value.trim();
+
+            if (!num1 || !num2) {
+                showError('⚠️ Both numbers are required.');
+                return;
+            }
+            const url = new URL('/calculator/add', window.location.origin);
+            url.searchParams.append('num1', num1);
+            url.searchParams.append('num2', num2);
+
+            addBtn.disabled = true;
+            resultSpan.style.color = '';  // reset color while fetching
+            resultSpan.textContent = '…';
+
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const payload = await res.json();
+
+                // Display result
+                resultSpan.textContent = payload.result;
+            } catch (err) {
+                console.error(err);
+                showError('Error: ' + err.message);
+            } finally {
+                addBtn.disabled = false;
+            }
+        });
+
+        [num1Input, num2Input].forEach(inp => {
+            inp.addEventListener('keypress', e => {
+                if (e.key === 'Enter') addBtn.click();
+            });
+        });
+    </script>
+</body>
 
 </html>
