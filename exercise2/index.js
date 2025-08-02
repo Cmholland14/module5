@@ -1,5 +1,4 @@
 const express = require("express");
-const calculatorRouter = express.Router();
 const app = express();
 
 app.use('/calculator',calculatorRouter)
