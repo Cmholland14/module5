@@ -1,4 +1,5 @@
 const express = require("express");
+const router = express.Router();
 const app1 = express();
 const app2 = express();
 
@@ -14,3 +15,8 @@ function startwebserver(app, port) {
   });
 }
 
+const calculatorRoutes =
+require('./routes/calculatorRoutes');
+
+
+app.use('/calculator', calculatorRoutes);
